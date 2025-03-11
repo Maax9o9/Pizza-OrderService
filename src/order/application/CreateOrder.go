@@ -4,7 +4,6 @@ import (
     "errors"
     "order-service/src/order/domain/entities"
     "order-service/src/order/application/repositorys"
-    "strconv"
 )
 
 type CreateOrder struct {
@@ -23,8 +22,7 @@ func (co *CreateOrder) Execute(order entities.Order) (entities.Order, error) {
         return entities.Order{}, errors.New("order ID is not set")
     }
 
-    orderIDStr := strconv.Itoa(order.ID) // Convertir int a string
-    err := co.rabbitRepository.PublishOrder(orderIDStr)
+    err := co.rabbitRepository.PublishOrder(order)
     if err != nil {
         return entities.Order{}, err
     }

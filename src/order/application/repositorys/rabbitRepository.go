@@ -1,7 +1,9 @@
 package repositorys
 
 import (
+    "encoding/json"
     "log"
+    "order-service/src/order/domain/entities"
     "order-service/src/order/infrastructure/adapters"
 )
 
@@ -15,14 +17,20 @@ func NewRabbitRepository(rabbitMQ *adapters.RabbitMQ) *RabbitRepository {
     }
 }
 
-func (r *RabbitRepository) PublishOrder(orderID string) error {
-    message := "Orden Enviada: " + orderID
-    err := r.rabbitMQ.Publish(message)
+func (r *RabbitRepository) PublishOrder(order entities.Order) error {
+    orderJSON, err := json.Marshal(order)
     if err != nil {
-        log.Printf("Fallo Haciendo la Orden: %v", err)
+        log.Printf("Error marshaling order: %v", err)
         return err
     }
-    log.Printf("Orden Hecha: %s", orderID)
+
+    message := string(orderJSON)
+    err = r.rabbitMQ.Publish(message)
+    if err != nil {
+        log.Printf("Failed to publish order: %v", err)
+        return err
+    }
+    log.Printf("Order published: %s", message)
     return nil
 }
 

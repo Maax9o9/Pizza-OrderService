@@ -1,8 +1,7 @@
 package entities
 
 type Order struct {
-	ID    int
+	ID         int
 	OrderItems string
-	Total float64
+	Total      float64
 }
- 
